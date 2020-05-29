@@ -3,8 +3,6 @@ package com.vladus177.albums.data
 import com.vladus177.albums.data.source.ImageDataSourceFactory
 import com.vladus177.albums.domain.ImageRepository
 import com.vladus177.albums.domain.model.ImageModel
-import io.reactivex.Observable
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class ImageDataRepository @Inject constructor(
@@ -12,20 +10,16 @@ class ImageDataRepository @Inject constructor(
 
 ) : ImageRepository {
 
-    override fun getImageList(albumId: Long, forceUpdate: Boolean): Observable<List<ImageModel>> {
-        return if (forceUpdate) {
-            Observable.mergeDelayError(
-                factory.getRemote().getImageList(albumId).doOnNext { users ->
-                    insertAll(users)
-                }.subscribeOn(Schedulers.io()),
-                factory.getLocal().getImageList(albumId).subscribeOn(
-                    Schedulers.io()
-                )
-            )
+    override suspend fun getImageList(albumId: Long, forceUpdate: Boolean): List<ImageModel> {
+        if (forceUpdate) {
+            val images = factory.getRemote().getImageList(albumId)
+            images?.let { insertAll(it) }
+
+            return factory.getLocal().getImageList(albumId)
         } else {
-            factory.getLocal().getImageList(albumId)
+            return factory.getLocal().getImageList(albumId)
         }
     }
 
-    override fun insertAll(images: List<ImageModel>) = factory.getLocal().insertAll(images)
+    override suspend fun insertAll(images: List<ImageModel>) = factory.getLocal().insertAll(images)
 }

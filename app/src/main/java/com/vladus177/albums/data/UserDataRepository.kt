@@ -4,13 +4,9 @@ package com.vladus177.albums.data
 import com.vladus177.albums.data.source.UserDataSourceFactory
 import com.vladus177.albums.domain.UserRepository
 
-import io.reactivex.Observable
-
 import javax.inject.Inject
 import javax.inject.Singleton
-import io.reactivex.schedulers.Schedulers
 import com.vladus177.albums.domain.model.UserModel
-import io.reactivex.Completable
 
 
 @Singleton
@@ -19,22 +15,20 @@ class UserDataRepository @Inject constructor(
 ) : UserRepository {
 
 
-    override fun setFavoriteUser(userId: Long, favorite: Boolean): Completable = factory.getLocal().setFavoriteUser(userId, favorite)
+    override suspend fun setFavoriteUser(userId: Long, favorite: Boolean) =
+        factory.getLocal().setFavoriteUser(userId, favorite)
 
 
-    override fun getUserList(forceUpdate: Boolean): Observable<List<UserModel>> {
-        return if (forceUpdate) {
-            Observable.mergeDelayError(
-                factory.getRemote().getUserList().doOnNext { users ->
-                    insertAll(users)
-                }.subscribeOn(Schedulers.io()),
-                factory.getLocal().getUserList().subscribeOn(Schedulers.io())
-            )
+    override suspend fun getUserList(forceUpdate: Boolean): List<UserModel> {
+        if (forceUpdate) {
+            val users = factory.getRemote().getUserList()
+            users?.let { insertAll(it) }
 
+            return factory.getLocal().getUserList()
         } else {
-            factory.getLocal().getUserList()
+            return factory.getLocal().getUserList()
         }
     }
 
-    override fun insertAll(users: List<UserModel>) = factory.getLocal().insertAll(users)
+    override suspend fun insertAll(users: List<UserModel>) = factory.getLocal().insertAll(users)
 }

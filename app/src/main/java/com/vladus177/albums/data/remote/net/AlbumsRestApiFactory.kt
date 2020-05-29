@@ -1,4 +1,4 @@
-package com.vladus177.albums.data.remote
+package com.vladus177.albums.data.remote.net
 
 import com.vladus177.albums.data.Constants.BASE_URL
 import retrofit2.converter.gson.GsonConverterFactory
@@ -14,6 +14,7 @@ class AlbumsRestApiFactory {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    val albumsApi: AlbumsRestApi = retrofit().create(AlbumsRestApi::class.java)
+    val albumsApi: AlbumsRestApi = retrofit().create(
+        AlbumsRestApi::class.java)
 
 }

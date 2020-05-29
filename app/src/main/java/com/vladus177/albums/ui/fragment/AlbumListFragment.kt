@@ -13,10 +13,10 @@ import com.vladus177.albums.common.ResourceState
 import com.vladus177.albums.common.util.NetworkStateManager
 import com.vladus177.albums.common.view.DynamicInformation
 import com.vladus177.albums.databinding.FragmentAlbumListBinding
+import com.vladus177.albums.domain.model.AlbumModel
 import com.vladus177.albums.presentation.AlbumListViewModel
 import com.vladus177.albums.ui.adapter.AlbumListAdapter
 import com.vladus177.albums.ui.adapter.OnAlbumItemClickListener
-import com.vladus177.albums.ui.model.AlbumView
 import dagger.android.support.DaggerFragment
 import javax.inject.Inject
 
@@ -62,7 +62,7 @@ class AlbumListFragment : DaggerFragment(), OnAlbumItemClickListener {
         viewModel.loadAlbumList(args.userId, forceUpdate)
     }
 
-    private fun updateAlbums(resource: Resource<List<AlbumView>>?) {
+    private fun updateAlbums(resource: Resource<List<AlbumModel>>?) {
         resource?.let {
             when (it.state) {
                 ResourceState.LOADING -> dynamicInfo.showLoading()
@@ -74,9 +74,15 @@ class AlbumListFragment : DaggerFragment(), OnAlbumItemClickListener {
                         }
                     }
                 }
-                ResourceState.ERROR -> dynamicInfo.showError()
+                ResourceState.ERROR -> {
+                    dynamicInfo.showError()
+                }
             }
-            it.data?.let { listAdapter.submitList(it) }
+            it.data?.let {
+                listAdapter.submitList(
+                    viewModel.convertAlbumModelsToAlbumViews(it)
+                )
+            }
         }
     }
 

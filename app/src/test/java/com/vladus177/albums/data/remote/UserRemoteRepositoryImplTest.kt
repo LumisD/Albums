@@ -4,6 +4,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import com.vladus177.albums.data.mapper.UserDataMapper
 import com.vladus177.albums.data.remote.model.UserEntry
+import com.vladus177.albums.data.remote.net.AlbumsRestApi
 import com.vladus177.albums.domain.model.UserModel
 import com.vladus177.albums.factory.ModelFactory.makeUserEntry
 import com.vladus177.albums.factory.ModelFactory.makeUserEntryList

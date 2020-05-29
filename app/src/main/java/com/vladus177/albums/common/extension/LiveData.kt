@@ -4,11 +4,19 @@ import androidx.lifecycle.MutableLiveData
 import com.vladus177.albums.common.Resource
 import com.vladus177.albums.common.ResourceState
 
-fun <T> MutableLiveData<Resource<T>>.setSuccess(data: T) =
-    postValue(Resource(ResourceState.SUCCESS, data))
+typealias LiveResult<T> = MutableLiveData<Resource<T>>
 
-fun <T> MutableLiveData<Resource<T>>.setLoading() =
-    postValue(Resource(ResourceState.LOADING, value?.data))
+@JvmName("postSuccessResult")
+fun <T> LiveResult<T>.postSuccess(data: T) = postValue(Resource(ResourceState.SUCCESS, data))
 
-fun <T> MutableLiveData<Resource<T>>.setError(message: String? = null) =
-    postValue(Resource(ResourceState.ERROR, value?.data, message))
+@JvmName("postLoadingResult")
+fun <T> LiveResult<T>.postLoading() = postValue(Resource(ResourceState.LOADING, value?.data))
+
+@JvmName("postErrorResult")
+fun <T> LiveResult<T>.postError(message: String? = null) = postValue(Resource(ResourceState.ERROR, value?.data, message))
+
+@JvmName("postEmptyResult")
+fun <T> LiveResult<T>.postEmpty() = postValue(Resource(ResourceState.EMPTY))
+
+@JvmName("postCancelResult")
+fun <T> LiveResult<T>.postCancel() = postValue(Resource(ResourceState.CANCEL))

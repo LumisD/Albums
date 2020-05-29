@@ -1,10 +1,18 @@
 package com.vladus177.albums.domain
 
 import com.vladus177.albums.domain.model.AlbumModel
-import io.reactivex.Observable
+import com.vladus177.albums.domain.requestparams.AlbumListRequestParam
+import com.vladus177.currencycheck.common.ResultUseCase
+import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 
-class GetAlbumListUseCase @Inject constructor(private val repository: AlbumRepository) {
-    fun getAlbumList(userId: Long, forceUpdate: Boolean): Observable<List<AlbumModel>> =
-        repository.getAlbumList(userId, forceUpdate)
+class GetAlbumListUseCase @Inject constructor(
+    private val repository: AlbumRepository
+) : ResultUseCase<AlbumListRequestParam, List<AlbumModel>>(
+    backgroundContext = Dispatchers.IO,
+    foregroundContext = Dispatchers.Main
+) {
+    override suspend fun executeOnBackground(params: AlbumListRequestParam): List<AlbumModel>? {
+        return repository.getAlbumList(params.userId, params.forceUpdate)
+    }
 }

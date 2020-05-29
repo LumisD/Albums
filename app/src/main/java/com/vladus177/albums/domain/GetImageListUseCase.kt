@@ -1,13 +1,19 @@
 package com.vladus177.albums.domain
 
-
 import com.vladus177.albums.domain.model.ImageModel
-import io.reactivex.Observable
+import com.vladus177.albums.domain.requestparams.ImageListRequestParam
+import com.vladus177.currencycheck.common.ResultUseCase
+import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 
 class GetImageListUseCase @Inject constructor(
     private val repository: ImageRepository
+) : ResultUseCase<ImageListRequestParam, List<ImageModel>>(
+    backgroundContext = Dispatchers.IO,
+    foregroundContext = Dispatchers.Main
 ) {
-    fun getImageList(albumId: Long, forceUpdate: Boolean): Observable<List<ImageModel>> =
-        repository.getImageList(albumId, forceUpdate)
+    override suspend fun executeOnBackground(params: ImageListRequestParam): List<ImageModel>? {
+        return repository.getImageList(params.albumId, params.forceUpdate)
+    }
+
 }

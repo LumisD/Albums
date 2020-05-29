@@ -1,12 +1,11 @@
 package com.vladus177.albums.data.repository
 
 import com.vladus177.albums.domain.model.ImageModel
-import io.reactivex.Observable
 
 interface ImageLocal {
 
-    fun getImageList(albumId: Long): Observable<List<ImageModel>>
+    suspend fun getImageList(albumId: Long): List<ImageModel>
 
-    fun insertAll(images: List<ImageModel>)
+    suspend fun insertAll(images: List<ImageModel>)
 
 }

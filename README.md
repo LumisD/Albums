@@ -7,3 +7,5 @@ Appplication with 3 screens that uses the JSONPlaceholder API (https://jsonplace
 # Tech/framework used
 Kotlin, Clean Architecture, MVVM, Dagger2, RxJava, LiveData, Retrofit, Room.
 
+**!! I forked the repo for testing purposes to change background execution from RxJava to Coroutine**
+

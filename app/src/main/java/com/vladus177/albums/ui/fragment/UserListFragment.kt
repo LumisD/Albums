@@ -18,14 +18,16 @@ import com.vladus177.albums.common.Resource
 import com.vladus177.albums.common.ResourceState
 import com.vladus177.albums.common.view.DynamicInformation
 import com.vladus177.albums.common.util.NetworkStateManager
+import com.vladus177.albums.domain.model.UserModel
 import com.vladus177.albums.ui.adapter.OnItemClickListener
-import com.vladus177.albums.ui.model.UserView
+import timber.log.Timber
 
 
 open class UserListFragment : DaggerFragment(), OnItemClickListener {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
+
     @Inject
     lateinit var networkStateManager: NetworkStateManager
 
@@ -56,7 +58,7 @@ open class UserListFragment : DaggerFragment(), OnItemClickListener {
         viewModel.loadUserList(forceUpdate)
     }
 
-    private fun updateUsers(resource: Resource<List<UserView>>?) {
+    private fun updateUsers(resource: Resource<List<UserModel>>?) {
         resource?.let {
             when (it.state) {
                 ResourceState.LOADING -> dynamicInfo.showLoading()
@@ -68,9 +70,14 @@ open class UserListFragment : DaggerFragment(), OnItemClickListener {
                         }
                     }
                 }
-                ResourceState.ERROR -> dynamicInfo.showError()
+                ResourceState.ERROR -> {
+                    dynamicInfo.showError()
+                }
             }
-            it.data?.let { listAdapter.submitList(it) }
+            it.data?.let {
+                val list = viewModel.convertUserModelsToUserViews(it)
+                listAdapter.submitList(list)
+            }
         }
     }
 

@@ -14,10 +14,10 @@ import com.vladus177.albums.common.ResourceState
 import com.vladus177.albums.common.util.NetworkStateManager
 import com.vladus177.albums.common.view.DynamicInformation
 import com.vladus177.albums.databinding.FragmentImageListBinding
+import com.vladus177.albums.domain.model.ImageModel
 import com.vladus177.albums.presentation.ImageListViewModel
 import com.vladus177.albums.ui.adapter.ImageListAdapter
 import com.vladus177.albums.ui.mapper.ImageViewMapper
-import com.vladus177.albums.ui.model.ImageView
 import dagger.android.support.DaggerFragment
 import javax.inject.Inject
 
@@ -25,10 +25,13 @@ class ImageListFragment : DaggerFragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
+
     @Inject
     lateinit var networkStateManager: NetworkStateManager
+
     @Inject
     lateinit var mapper: ImageViewMapper
+
     @Inject
     lateinit var listAdapter: ImageListAdapter
 
@@ -60,7 +63,7 @@ class ImageListFragment : DaggerFragment() {
         viewModel.loadImageList(args.albumId, forceUpdate)
     }
 
-    private fun updateImages(resource: Resource<List<ImageView>>?) {
+    private fun updateImages(resource: Resource<List<ImageModel>>?) {
         resource?.let {
             when (it.state) {
                 ResourceState.LOADING -> dynamicInfo.showLoading()
@@ -74,7 +77,11 @@ class ImageListFragment : DaggerFragment() {
                 }
                 ResourceState.ERROR -> dynamicInfo.showError()
             }
-            it.data?.let { listAdapter.submitList(it) }
+            it.data?.let {
+                listAdapter.submitList(
+                    viewModel.convertImageModelsToImageViews(it)
+                )
+            }
         }
     }
 

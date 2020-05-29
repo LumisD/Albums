@@ -6,12 +6,10 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 
-import com.vladus177.albums.data.remote.AlbumsRestApiFactory
+import com.vladus177.albums.data.remote.net.AlbumsRestApiFactory
 import javax.inject.Singleton
 import android.net.ConnectivityManager
 import com.squareup.picasso.Picasso
-import com.vladus177.albums.common.PostExecutionThread
-import com.vladus177.albums.common.UiThread
 import com.vladus177.albums.common.util.NetworkStateManager
 import com.vladus177.albums.data.AlbumDataRepository
 import com.vladus177.albums.data.ImageDataRepository
@@ -126,9 +124,4 @@ abstract class ApplicationModuleBinds {
 
     @Binds
     abstract fun bindImageRemote(imageRemote: ImageRemoteRepositoryImpl): ImageRemote
-
-
-    @Binds
-    abstract fun bindPostExecutionThread(uiThread: UiThread): PostExecutionThread
-
 }
