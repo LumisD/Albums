@@ -1,6 +1,5 @@
-package com.vladus177.currencycheck.common
+package com.vladus177.albums.common.extension
 
-import com.vladus177.albums.common.extension.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
@@ -63,7 +62,6 @@ abstract class ResultUseCase<Q, T>(
                     }
                 }
             }
-
         }
     }
 
@@ -74,4 +72,26 @@ abstract class ResultUseCase<Q, T>(
             }
         }
     }
+
+    //for cases when we have to wait a first suspend fun before launch the second (see setFavoriteUser in UserListViewModel)
+    override suspend fun executeSuspend(liveData: LiveResult<T>, params: Q) {
+        runCatching {
+            withContext(backgroundContext) { executeOnBackground(params)!! }
+        }.onSuccess { response ->
+            liveData.postSuccess(response)
+        }.onFailure { throwable ->
+            when (throwable) {
+                is CancellationException -> liveData.postCancel()
+                is NullPointerException -> liveData.postEmpty()
+                else -> liveData.postError(throwable.message)
+            }
+        }
+    }
+
+    override suspend fun executeWithoutResponseSuspend(params: Q) {
+        runCatching {
+            withContext(backgroundContext) { executeOnBackground(params)!! }
+        }
+    }
+
 }

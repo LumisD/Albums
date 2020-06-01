@@ -9,6 +9,7 @@ import com.vladus177.albums.domain.requestparams.FavoriteRequestParam
 import com.vladus177.albums.domain.requestparams.UserListRequestParam
 import com.vladus177.albums.ui.mapper.UserViewMapper
 import com.vladus177.albums.ui.model.UserView
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class UserListViewModel @Inject constructor(
@@ -28,7 +29,7 @@ class UserListViewModel @Inject constructor(
                 repeatQuantity = 5
             )
         } else {
-            val job = getUserListUseCase.execute(
+            getUserListUseCase.execute(
                 liveData = users,
                 params = UserListRequestParam(forceUpdate)
             )
@@ -36,11 +37,15 @@ class UserListViewModel @Inject constructor(
     }
 
     fun setFavorite(userId: Long, favorite: Boolean) {
-        setFavoriteUseCase.executeWithoutResponse(
-            params = FavoriteRequestParam(userId, favorite)
-        )
-
-        loadUserList(false)
+        CoroutineScope(Dispatchers.Main).launch {
+            setFavoriteUseCase.executeWithoutResponseSuspend(
+                params = FavoriteRequestParam(userId, favorite)
+            )
+            getUserListUseCase.executeSuspend(
+                liveData = users,
+                params = UserListRequestParam(false)
+            )
+        }
     }
 
     fun convertUserModelsToUserViews(userModels: List<UserModel>): List<UserView> {

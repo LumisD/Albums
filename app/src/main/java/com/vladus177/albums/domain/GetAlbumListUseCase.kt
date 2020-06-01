@@ -2,7 +2,7 @@ package com.vladus177.albums.domain
 
 import com.vladus177.albums.domain.model.AlbumModel
 import com.vladus177.albums.domain.requestparams.AlbumListRequestParam
-import com.vladus177.currencycheck.common.ResultUseCase
+import com.vladus177.albums.common.extension.ResultUseCase
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 
